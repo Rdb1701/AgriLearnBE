@@ -24,29 +24,41 @@ class ClassEnrollmentController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'email'        => 'required|string|max:255|unique:class_enrollments,email',
-            'classroom_id' => 'required|max:255'
-        ]);
-
-        $classEnrollment =  ClassEnrollment::create([
-            'email'        => $data['email'],
-            'classroom_id' => $data['classroom_id'],
-            'status'       => false
+            'emails'        => 'required|array',
+            'emails.*'      => 'required|email|max:255',
+            'classroom_id'  => 'required|exists:classrooms,id'
         ]);
 
         $classroom = \App\Models\Classroom::find($data['classroom_id']);
         $classroomName = $classroom->class_name ?? 'Your Class';
 
-        $inviteLink = url('/join-classroom/' . $classroom->id . '?email=' . urlencode($data['email']));
+        $results = [];
 
-        Mail::to($data['email'])->send(new SendStudentsEmail($classroomName, $inviteLink));
+        foreach ($data['emails'] as $email) {
+            // Skip if already enrolled
+            if (ClassEnrollment::where('email', $email)->where('classroom_id', $data['classroom_id'])->exists()) {
+                $results[] = ['email' => $email, 'status' => 'already invited'];
+                continue;
+            }
+
+            $classEnrollment = ClassEnrollment::create([
+                'email'        => $email,
+                'classroom_id' => $data['classroom_id'],
+                'status'       => false
+            ]);
+
+            $inviteLink = url('/join-classroom/' . $classroom->id . '?email=' . urlencode($email));
+            Mail::to($email)->send(new SendStudentsEmail($classroomName, $inviteLink));
+
+            $results[] = ['email' => $email, 'status' => 'invited'];
+        }
 
         return response()->json([
-            $classEnrollment,
-            'message' => 'Successfully Invited a Student'
+            'results' => $results,
+            'message' => 'Bulk invitations processed.'
         ]);
-        
     }
+
 
     /**
      * Display the specified resource.

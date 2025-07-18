@@ -17,7 +17,6 @@ class ClassroomController extends Controller
     public function index()
     {
         $user = Auth::user();
-
         $classrooms = Classroom::query()->where('instructor_id', $user->id)->get();
 
         return response()->json($classrooms);
@@ -35,7 +34,7 @@ class ClassroomController extends Controller
         if (!Auth::user()) {
             return response()->json(['error' => 'Not authenticated'], 401);
         }
-
+        
         $classroom = Classroom::create($data);
 
         return response()->json($classroom);
@@ -79,4 +78,6 @@ class ClassroomController extends Controller
             'message' => "Successfully Deleted"
         ]);
     }
+
+    
 }
