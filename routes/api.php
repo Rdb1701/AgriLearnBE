@@ -4,11 +4,15 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClassEnrollmentController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ClassroomController;
+use App\Http\Controllers\Api\OAuthController;
 use App\Mail\SendStudentsEmail;
 use App\Models\ClassEnrollment;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Route;
+use Laravel\Socialite\Facades\Socialite;
+use Illuminate\Support\Str;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
@@ -31,5 +35,14 @@ Route::middleware(['auth:sanctum', 'instructor'])->group(function(){
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'signup']);
+
+
+
+
+// Google OAuth redirect
+Route::get('/auth/google/redirect',[OAuthController::class, 'redirect'] );
+
+// Google OAuth callback
+Route::get('/auth/google/callback', [OAuthController::class, 'callback'] );
 
 

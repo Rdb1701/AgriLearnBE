@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('id_number')->nullable()->unique();
             $table->boolean('isActive')->default(false);
             $table->foreignId('added_by')->nullable()->constrained('users');
+            $table->string('google_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

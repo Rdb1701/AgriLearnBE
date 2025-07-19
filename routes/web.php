@@ -1,7 +1,12 @@
 <?php
 
 use App\Mail\SendStudentsEmail;
+use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Str;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -13,3 +18,5 @@ Route::get('/', function () {
 //     Mail::to('ronaldbesinga287@gmail.com')->send(new SendStudentsEmail());
 //     return 'Email has been sent!';
 // });
+
+
