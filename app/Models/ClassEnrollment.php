@@ -15,4 +15,10 @@ class ClassEnrollment extends Model
         'classroom_id',
         'status'
     ];
+
+
+    public function classrooms()
+    {
+        return $this->belongsTo(Classroom::class);
+    }
 }

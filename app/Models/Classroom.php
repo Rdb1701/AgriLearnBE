@@ -10,10 +10,21 @@ class Classroom extends Model
     /** @use HasFactory<\Database\Factories\ClassroomFactory> */
     use HasFactory;
 
-  protected $fillable = [
+    protected $fillable = [
         'instructor_id',
         'class_name',
         'subject',
         'section_code'
     ];
+
+
+    public function instructor()
+    {
+        return $this->belongsTo(User::class, 'instructor_id');
+    }
+
+    public function instruction_materials()
+    {
+        return $this->hasMany(InstructionalMaterial::class);
+    }
 }

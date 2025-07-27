@@ -26,7 +26,9 @@ class User extends Authenticatable
         'id_number',
         'isActive',
         'added_by',
-        'google_id'
+        'google_id',
+        'avatar',
+        'email_verified_at'
     ];
 
     /**
@@ -50,5 +52,11 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+
+    public function intructor_classrooms()
+    {
+        return $this->hasMany(Classroom::class, 'instructor_id');
     }
 }

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\OAuthController;
 use App\Mail\SendStudentsEmail;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -20,3 +21,8 @@ Route::get('/', function () {
 // });
 
 
+// Google OAuth redirect
+Route::get('/auth/google/redirect',[OAuthController::class, 'redirect']);
+
+// Google OAuth callback
+Route::get('/auth/google/callback', [OAuthController::class, 'callback']);

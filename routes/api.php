@@ -19,7 +19,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 
-Route::middleware(['auth:sanctum', 'instructor'])->group(function(){
+Route::middleware(['auth:sanctum', 'instructor'])->group(function () {
 
     //User Routes
     Route::apiResource('/users', UserController::class);
@@ -29,20 +29,11 @@ Route::middleware(['auth:sanctum', 'instructor'])->group(function(){
     Route::apiResource('/classroom', ClassroomController::class);
 
     //class enrollment
+    Route::get('/class_enrollment', [ClassEnrollmentController::class, 'index']);
     Route::post('/class_enrollment', [ClassEnrollmentController::class, 'store']);
+    Route::delete('/class_enrollment/{class_enrollment}', [ClassEnrollmentController::class, 'destroy']);
 
 });
 
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/register', [AuthController::class, 'signup']);
-
-
-
-
-// Google OAuth redirect
-Route::get('/auth/google/redirect',[OAuthController::class, 'redirect'] );
-
-// Google OAuth callback
-Route::get('/auth/google/callback', [OAuthController::class, 'callback'] );
-
-

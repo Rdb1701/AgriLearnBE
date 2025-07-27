@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Mail\SendStudentsEmail;
 use App\Models\ClassEnrollment;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 
 class ClassEnrollmentController extends Controller
@@ -15,7 +17,15 @@ class ClassEnrollmentController extends Controller
      */
     public function index()
     {
-        //
+        $class_enrollments = DB::table('class_enrollments as ce')
+            ->leftJoin('classrooms as c', 'c.id', 'ce.classroom_id')
+            ->leftJoin('users as us', 'us.email', 'ce.email')
+            ->select('ce.*', 'us.name')
+            ->orderBy('email', 'ASC')
+            ->where('c.instructor_id', Auth::id())
+            ->get();
+
+        return $class_enrollments;
     }
 
     /**
@@ -23,10 +33,11 @@ class ClassEnrollmentController extends Controller
      */
     public function store(Request $request)
     {
+        $emailsInput = $request->input('emails');
+        $emails = is_array($emailsInput) ? $emailsInput : [$emailsInput];
+
         $data = $request->validate([
-            'emails'        => 'required|array',
-            'emails.*'      => 'required|email|max:255',
-            'classroom_id'  => 'required|exists:classrooms,id'
+            'classroom_id' => 'required|exists:classrooms,id'
         ]);
 
         $classroom = \App\Models\Classroom::find($data['classroom_id']);
@@ -34,30 +45,45 @@ class ClassEnrollmentController extends Controller
 
         $results = [];
 
-        foreach ($data['emails'] as $email) {
-            // Skip if already enrolled
-            if (ClassEnrollment::where('email', $email)->where('classroom_id', $data['classroom_id'])->exists()) {
+        foreach ($emails as $email) {
+            // Check if email already exists (globally or for this classroom)
+            $alreadyEnrolled = ClassEnrollment::where('email', $email)
+                ->where('classroom_id', $data['classroom_id'])
+                ->exists();
+
+            if ($alreadyEnrolled) {
                 $results[] = ['email' => $email, 'status' => 'already invited'];
                 continue;
             }
 
-            $classEnrollment = ClassEnrollment::create([
-                'email'        => $email,
-                'classroom_id' => $data['classroom_id'],
-                'status'       => false
-            ]);
+            // Try insert — if email is globally unique (not per classroom), this avoids DB exception
+            try {
+                ClassEnrollment::create([
+                    'email'        => $email,
+                    'classroom_id' => $data['classroom_id'],
+                    'status'       => false,
+                ]);
 
-            $inviteLink = url('/join-classroom/' . $classroom->id . '?email=' . urlencode($email));
-            Mail::to($email)->send(new SendStudentsEmail($classroomName, $inviteLink));
+                $inviteLink = url('/join-classroom/' . $classroom->id . '?email=' . urlencode($email));
+                // Mail::to($email)->send(new SendStudentsEmail($classroomName, $inviteLink));
 
-            $results[] = ['email' => $email, 'status' => 'invited'];
+                $results[] = ['email' => $email, 'status' => 'invited'];
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Handle duplicate or DB errors gracefully
+                if ($e->getCode() == '23505') {
+                    $results[] = ['email' => $email, 'status' => 'already exists'];
+                } else {
+                    $results[] = ['email' => $email, 'status' => 'error'];
+                }
+            }
         }
 
         return response()->json([
             'results' => $results,
-            'message' => 'Bulk invitations processed.'
+            'message' => 'Invitations processed.'
         ]);
     }
+
 
 
     /**
@@ -81,6 +107,8 @@ class ClassEnrollmentController extends Controller
      */
     public function destroy(ClassEnrollment $classEnrollment)
     {
-        //
+        $classEnrollment->delete();
+
+        return response(null, 204);
     }
 }

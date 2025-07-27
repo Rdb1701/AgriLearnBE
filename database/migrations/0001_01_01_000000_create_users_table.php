@@ -22,6 +22,7 @@ return new class extends Migration
             $table->boolean('isActive')->default(false);
             $table->foreignId('added_by')->nullable()->constrained('users');
             $table->string('google_id')->nullable();
+            $table->string('avatar')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

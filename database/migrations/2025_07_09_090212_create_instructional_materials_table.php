@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('classroom_id')->constrained('classrooms')->cascadeOnDelete();
             $table->foreignId('uploaded_by')->constrained('users')->cascadeOnDelete();
+            $table->text('description')->nullable();
             $table->string('title');
             $table->string('file_type');
             $table->string('file_path');
