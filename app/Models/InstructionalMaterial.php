@@ -19,6 +19,7 @@ class InstructionalMaterial extends Model
         'file_type',
         'file_path',
         'isOffline'
+        
     ];
 
 
@@ -29,6 +30,6 @@ class InstructionalMaterial extends Model
 
     public function instructor_classroom()
     {
-        return $this->belongsTo(User::class, 'uplaoded_by');
+        return $this->belongsTo(User::class, 'uploaded_by');
     }
 }

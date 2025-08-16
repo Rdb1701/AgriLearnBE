@@ -4,9 +4,11 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\ClassEnrollmentController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\ClassroomController;
+use App\Http\Controllers\Api\InstructionalMaterialController;
 use App\Http\Controllers\Api\OAuthController;
 use App\Mail\SendStudentsEmail;
 use App\Models\ClassEnrollment;
+use App\Models\InstructionalMaterial;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -33,6 +35,10 @@ Route::middleware(['auth:sanctum', 'instructor'])->group(function () {
     Route::post('/class_enrollment', [ClassEnrollmentController::class, 'store']);
     Route::delete('/class_enrollment/{class_enrollment}', [ClassEnrollmentController::class, 'destroy']);
 
+
+    //MATERIALS
+    Route::apiResource('/materials', InstructionalMaterialController::class);
+    Route::get('/classroom/{id}/materials', [InstructionalMaterialController::class, 'getMaterialByClassroom']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
