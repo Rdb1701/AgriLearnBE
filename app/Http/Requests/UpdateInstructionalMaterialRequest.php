@@ -22,13 +22,13 @@ class UpdateInstructionalMaterialRequest extends FormRequest
     public function rules(): array
     {
       return [
-            'classroom_id'=> 'required|max:11', //'required|exists:classrooms,id'
-            'uploaded_by' => 'required|max:11', //'required|exists:users,id'
-            'title'       => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'new_files'       => 'array',
-            'new_files.*'     => 'file|mimes:pdf,doc,docx,ppt,pptx,txt,png,jpg,jpeg|max:20480', // adjust types/sizes
-            'isOffline'   => 'nullable|boolean'
+            'classroom_id' => 'required|max:11', //'required|exists:classrooms,id'
+            'uploaded_by'  => 'required|max:11', //'required|exists:users,id'
+            'title'        => 'required|string|max:255',
+            'description'  => 'nullable|string',
+            'new_files'    => 'array',
+            'new_files.*'  => 'file|mimes:pdf,doc,docx,ppt,pptx,txt,png,jpg,jpeg|max:20480', // adjust types/sizes
+            'isOffline'    => 'nullable|boolean'
         ];
     }
 }

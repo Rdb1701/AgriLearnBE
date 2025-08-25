@@ -10,6 +10,7 @@ use App\Http\Resources\InstructionMaterialResource;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class InstructionalMaterialController extends Controller
 {
@@ -39,8 +40,12 @@ class InstructionalMaterialController extends Controller
         $fileTypes = [];
 
         foreach ($files as $file) {
-            $path = $file->store('instructional_materials', 'public');
+            $originalName = $file->getClientOriginalName(); // e.g., lesson1.pdf
+            $uniqueName = time() . '_' . Str::random(5) . '_' . $originalName; // e.g., 1692792975_AB12x_lesson1.pdf
+            $path = $file->storeAs('instructional_materials', $uniqueName, 'public');
+
             $filePaths[] = $path;
+            $fileNames[] = $originalName;
             $fileTypes[] = $file->getClientOriginalExtension();
         }
 
@@ -75,7 +80,7 @@ class InstructionalMaterialController extends Controller
     public function update(UpdateInstructionalMaterialRequest $request, InstructionalMaterial $material)
     {
         try {
-      
+
             $material->title = $request->input('title');
             $material->description = $request->input('description');
 
@@ -83,26 +88,26 @@ class InstructionalMaterialController extends Controller
             $currentFilePaths = json_decode($material->file_path, true) ?? [];
             $currentFileTypes = json_decode($material->file_type, true) ?? [];
 
-    
+
             if ($request->has('delete_files')) {
                 $filesToDelete = $request->input('delete_files');
-                
+
                 foreach ($filesToDelete as $fileToDelete) {
-                  
+
                     $index = array_search($fileToDelete, $currentFilePaths);
-                    
+
                     if ($index !== false) {
-                      
+
                         if (Storage::disk('public')->exists($fileToDelete)) {
                             Storage::disk('public')->delete($fileToDelete);
                         }
-                        
-                        
+
+
                         unset($currentFilePaths[$index]);
                         unset($currentFileTypes[$index]);
                     }
                 }
-                
+
                 // Re-index after deletion
                 $currentFilePaths = array_values($currentFilePaths);
                 $currentFileTypes = array_values($currentFileTypes);
@@ -111,7 +116,7 @@ class InstructionalMaterialController extends Controller
             // Handle new file uploads
             if ($request->hasFile('new_files')) {
                 $newFiles = $request->file('new_files');
-                
+
                 foreach ($newFiles as $file) {
                     $path = $file->store('instructional_materials', 'public');
                     $currentFilePaths[] = $path;
@@ -139,10 +144,9 @@ class InstructionalMaterialController extends Controller
                 'message' => 'Instructional material updated successfully.',
                 'material' => new InstructionMaterialResource($material)
             ], 200);
-
         } catch (\Exception $e) {
             Log::error('Error updating instructional material: ' . $e->getMessage());
-            
+
             return response()->json([
                 'message' => 'Failed to update instructional material.',
                 'error' => $e->getMessage()
@@ -158,24 +162,23 @@ class InstructionalMaterialController extends Controller
         try {
             // Get file paths to delete from storage
             $filePaths = json_decode($material->file_path, true) ?? [];
-            
+
             // Delete files from storage
             foreach ($filePaths as $filePath) {
                 if (Storage::disk('public')->exists($filePath)) {
                     Storage::disk('public')->delete($filePath);
                 }
             }
-            
+
             // Delete the database record
             $material->delete();
-            
+
             return response()->json([
                 'message' => 'Instructional material deleted successfully.'
             ], 200);
-            
         } catch (\Exception $e) {
             Log::error('Error deleting instructional material: ' . $e->getMessage());
-            
+
             return response()->json([
                 'message' => 'Failed to delete instructional material.',
                 'error' => $e->getMessage()
