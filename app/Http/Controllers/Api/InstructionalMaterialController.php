@@ -8,6 +8,7 @@ use App\Http\Requests\StoreInstructionalMaterialRequest;
 use App\Http\Requests\UpdateInstructionalMaterialRequest;
 use App\Http\Resources\InstructionMaterialResource;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
@@ -21,7 +22,10 @@ class InstructionalMaterialController extends Controller
 
     public function getMaterialByClassroom($classroom_id)
     {
-        $materials = InstructionalMaterial::query()
+        $materials = DB::table('instructional_materials as m')
+            ->leftJoin('classrooms as c', 'c.id', 'm.classroom_id')
+            ->leftJoin('users as u', 'u.id', 'c.instructor_id')
+            ->select('m.*', 'u.name')
             ->where('classroom_id', $classroom_id)
             ->distinct()
             ->orderBy('id', 'desc')
@@ -40,8 +44,8 @@ class InstructionalMaterialController extends Controller
         $fileTypes = [];
 
         foreach ($files as $file) {
-            $originalName = $file->getClientOriginalName(); // e.g., lesson1.pdf
-            $uniqueName = time() . '_' . Str::random(5) . '_' . $originalName; // e.g., 1692792975_AB12x_lesson1.pdf
+            $originalName = $file->getClientOriginalName();
+            $uniqueName = time() . '_' . Str::random(5) . '_' . $originalName;
             $path = $file->storeAs('instructional_materials', $uniqueName, 'public');
 
             $filePaths[] = $path;
@@ -49,7 +53,7 @@ class InstructionalMaterialController extends Controller
             $fileTypes[] = $file->getClientOriginalExtension();
         }
 
-        // Store as JSON arrays in the database
+
         $material = InstructionalMaterial::create([
             'classroom_id' => $request->input('classroom_id'),
             'uploaded_by'  => $request->input('uploaded_by'),

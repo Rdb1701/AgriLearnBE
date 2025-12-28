@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('quiz_scores', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('quiz_id')->constrained('quiz_questions')->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->string('quiz_code')->nullable();
+            $table->foreignId('classroom_id')->constrained('classrooms');
+            $table->foreignId('student_id')->constrained('users')->cascadeOnDelete();
+            $table->string('quiz_code');
             $table->string('score');
-            $table->string('total_score');
+            $table->string('total_questions');
+            $table->string('correct_answers');
+            $table->json('answers')->nullable();
             $table->timestamps();
         });
     }

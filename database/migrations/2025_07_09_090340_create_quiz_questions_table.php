@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('classroom_id')->constrained('classrooms')->cascadeOnDelete();
             $table->foreignId('created_by')->constrained('users')->cascadeOnDelete();
+            $table->string('quiz_code')->nullable();
             $table->text('questions_text');
             $table->text('options');
             $table->text('correct_answer');

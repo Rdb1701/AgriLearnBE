@@ -19,7 +19,7 @@ class QuizController extends Controller
     {
         $quizzes = QuizQuestion::query()
             ->where('classroom_id', $classroom_id)
-            ->select('classroom_id', 'quiz_title', 'created_at')
+            ->select('classroom_id', 'quiz_title', 'created_at', 'quiz_code', 'due_date')
             ->distinct()
             ->orderBy('created_at', 'desc')
             ->get();
@@ -45,18 +45,24 @@ class QuizController extends Controller
         $quizTitle = $request->quiz_title;
         $classroomId = $request->classroom_id;
         $createdBy = $request->created_by;
+        $dueDate = $request->due_date;
 
         $questions = $request->questions;
+
+        $quizCode = now()->format('YmdHis');
+
 
         foreach ($questions as $q) {
             QuizQuestion::create([
                 'classroom_id'     => $classroomId,
                 'created_by'       => $createdBy,
                 'quiz_title'       => $quizTitle,
+                'quiz_code'        => $quizCode,
                 'questions_text'   => $q['questions_text'],
                 'options'          => json_encode($q['options']),
                 'correct_answer'   => $q['correct_answer'],
-                'difficulty_level' => $q['difficulty_level']
+                'difficulty_level' => $q['difficulty_level'],
+                'due_date'         => $dueDate
             ]);
         }
 
@@ -91,6 +97,7 @@ class QuizController extends Controller
     {
         $quizTitle = $request->quiz_title;
         $questions = $request->questions;
+        $due_date = $request->due_date;
 
         if (!$questions || !is_array($questions)) {
             return response()->json([
@@ -109,7 +116,8 @@ class QuizController extends Controller
                         'questions_text'   => $q['questions_text'],
                         'options'          => json_encode($q['options']),
                         'correct_answer'   => $q['correct_answer'],
-                        'difficulty_level' => $q['difficulty_level']
+                        'difficulty_level' => $q['difficulty_level'],
+                        'due_date'         => $due_date
                     ]);
                 }
             }

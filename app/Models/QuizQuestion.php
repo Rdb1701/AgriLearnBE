@@ -16,9 +16,11 @@ class QuizQuestion extends Model
         'created_by',
         'questions_text',
         'options',
+        'quiz_code',
         'correct_answer',
         'difficulty_level',
         'quiz_title',
-        'created_at'
+        'created_at',
+        'due_date'
     ];
 }

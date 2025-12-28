@@ -2,21 +2,24 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-
-class ClassEnrollment extends Model
+class GameSave extends Model
 {
-    /** @use HasFactory<\Database\Factories\ClassEnrollmentFactory> */
-    use HasFactory;
-
     protected $fillable = [
-        'email',
+        'user_id',
         'classroom_id',
-        'status'
+        'save_data',
     ];
 
+    protected $casts = [
+        'save_data' => 'array',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 
     public function classroom()
     {

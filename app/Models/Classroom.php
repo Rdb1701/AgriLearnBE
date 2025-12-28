@@ -14,7 +14,8 @@ class Classroom extends Model
         'instructor_id',
         'class_name',
         'subject',
-        'section_code'
+        'section_code',
+        'status',
     ];
 
 

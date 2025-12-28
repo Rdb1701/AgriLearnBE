@@ -77,8 +77,8 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         $user->delete();
-        
-       return response()->json(['message' => 'User deleted successfully'], 200);
+
+        return response()->json(['message' => 'User deleted successfully'], 200);
     }
 
     public function deactivate(User $user)
@@ -88,11 +88,15 @@ class UserController extends Controller
         ]);
 
         if ($data) {
-            return response(201);
+            return response(200);
         } else {
             return response()->json([
                 'message' => "error in deactivating account",
             ]);
         }
     }
+
+
+
+   
 }

@@ -7,6 +7,7 @@ use App\Models\Classroom;
 use App\Http\Requests\StoreClassroomRequest;
 use App\Http\Requests\UpdateClassroomRequest;
 use App\Http\Resources\ClassroomResource;
+use App\Models\ClassEnrollment;
 use Illuminate\Support\Facades\Auth;
 
 class ClassroomController extends Controller
@@ -17,9 +18,25 @@ class ClassroomController extends Controller
     public function index()
     {
         $user = Auth::user();
-        $classrooms = Classroom::query()->where('instructor_id', $user->id)->get();
+        $classrooms = Classroom::query()->where('status', true)->where('instructor_id', $user->id)->get();
 
         return response()->json($classrooms);
+    }
+
+
+    public function getArchive()
+    {
+        $user = Auth::user();
+        $classrooms = Classroom::query()->where('status', false)->where('instructor_id', $user->id)->get();
+
+        return response()->json($classrooms);
+    }
+
+    public function getClassroomStatus($classroom_id)
+    {
+        $classroom = Classroom::query()->where('id', $classroom_id)->first();
+
+        return response()->json($classroom);
     }
 
     /**
@@ -34,7 +51,7 @@ class ClassroomController extends Controller
         if (!Auth::user()) {
             return response()->json(['error' => 'Not authenticated'], 401);
         }
-        
+
         $classroom = Classroom::create($data);
 
         return response()->json($classroom);
@@ -55,7 +72,7 @@ class ClassroomController extends Controller
     {
         $data = $request->validated();
 
-         $data['instructor_id'] = Auth::user()->id;
+        $data['instructor_id'] = Auth::user()->id;
 
         //if not authenticated
         if (!Auth::user()) {
@@ -79,5 +96,42 @@ class ClassroomController extends Controller
         ]);
     }
 
-    
+
+    public function getStudentClass()
+    {
+
+        $user = Auth::user();
+        $email = $user->email;
+
+        //dd($email);
+
+        $classrooms = ClassEnrollment::with('classroom')
+            ->where('email', $email)
+            ->whereHas('classroom', function ($query) {
+                $query->where('status', true);
+            })
+            //->where('status', true)
+            ->get()
+            ->pluck('classroom')
+            ->filter()
+            ->values();
+
+        return response()->json($classrooms);
+    }
+
+
+    public function archiveClass($classroom_id)
+    {
+        $user = Auth::user();
+
+        $archive = Classroom::where('id', $classroom_id)
+            ->update(['status' => false]);
+
+
+        if ($archive) {
+            return response()->json(['message' => 'Subject udpated successfully.']);
+        } else {
+            return response()->json(['message' => 'No Subject found to delete.'], 404);
+        }
+    }
 }

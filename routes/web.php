@@ -23,6 +23,7 @@ Route::get('/', function () {
 
 // Google OAuth redirect
 Route::get('/auth/google/redirect',[OAuthController::class, 'redirect']);
-
-// Google OAuth callback
 Route::get('/auth/google/callback', [OAuthController::class, 'callback']);
+
+Route::get('/auth/google/instructor/redirect', [OAuthController::class, 'instructorRedirect'])->name('google.instructor.redirect');
+Route::get('/auth/google/instructor/callback', [OAuthController::class, 'instructorCallback'])->name('google.instructor.callback');

@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('class_enrollments', function (Blueprint $table) {
+        Schema::create('game_saves', function (Blueprint $table) {
             $table->id();
-            $table->string('email');
-            $table->foreignId('classroom_id')->constrained('classrooms')->cascadeOnDelete();
-            $table->boolean('status')->default(false);
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('classroom_id')->constrained('classrooms')->onDelete('cascade');
+            $table->json('save_data');
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('class_enrollments');
+        Schema::dropIfExists('game_saves');
     }
 };
