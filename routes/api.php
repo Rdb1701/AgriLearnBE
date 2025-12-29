@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\OAuthController;
 use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\QuizScoreController;
 use App\Http\Controllers\Api\QuizAnalyticsController;
+use App\Http\Controllers\Api\RoomTaskController;
 use App\Mail\SendStudentsEmail;
 use App\Models\ClassEnrollment;
 use App\Models\Classroom;
@@ -60,6 +61,9 @@ Route::middleware(['auth:sanctum', 'instructor'])->group(function () {
     Route::get('/student-performance', [QuizAnalyticsController::class, 'studentPerformance']);
     Route::get('/completion-trends', [QuizAnalyticsController::class, 'completionTrends']);
     Route::get('/difficulty-analysis', [QuizAnalyticsController::class, 'difficultyAnalysis']);
+
+    // Room Tasks
+    Route::apiResource('/room-tasks', RoomTaskController::class);
 });
 
 //STUDENT ROUTES
@@ -117,6 +121,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/questions', [QuizAnalyticsController::class, 'Allquestions']);
     Route::get('/scores', [QuizAnalyticsController::class, 'Allscores']);
+
+    // Room Tasks General
+    Route::get('/tasks', [RoomTaskController::class, 'getAllTasks']);
+    Route::get('/room-tasks/user/room/{classroom}', [RoomTaskController::class, 'getUserRoomTasks']);
+    Route::put('/room-tasks/user/task/{classroom}', [RoomTaskController::class, 'updateUserRoomTask']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
