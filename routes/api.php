@@ -63,7 +63,7 @@ Route::middleware(['auth:sanctum', 'instructor'])->group(function () {
     Route::get('/difficulty-analysis', [QuizAnalyticsController::class, 'difficultyAnalysis']);
 
     // Room Tasks
-    Route::apiResource('/room-tasks', RoomTaskController::class);
+    Route::apiResource('/room-tasks', RoomTaskController::class)->except(['index']);
 });
 
 //STUDENT ROUTES
@@ -123,6 +123,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/scores', [QuizAnalyticsController::class, 'Allscores']);
 
     // Room Tasks General
+    Route::get('/room-tasks', [RoomTaskController::class, 'index']);
     Route::get('/tasks', [RoomTaskController::class, 'getAllTasks']);
     Route::get('/room-tasks/user/room/{classroom}', [RoomTaskController::class, 'getUserRoomTasks']);
     Route::put('/room-tasks/user/task/{classroom}', [RoomTaskController::class, 'updateUserRoomTask']);
