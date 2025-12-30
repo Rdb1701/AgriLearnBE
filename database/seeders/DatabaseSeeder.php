@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
         Task::factory()->create([
             'code' => 'LAND_PREP',
             'name' => 'Land Preparation',
-            'description' => 'Prepare the land for planting by tilling the soil,',
+            'description' => 'Prepare the land for planting by tilling the soil.',
         ]);
 
         Task::factory()->create([
