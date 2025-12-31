@@ -102,9 +102,8 @@ class RoomTaskController extends Controller
 
         $roomTasks = RoomTask::where('room_id', $classroom->id)
             ->where('is_active', true)
-            ->with(['task', 'userRoomTasks' => function ($query) use ($userId) {
-                $query->where('user_id', $userId)
-                      ->where('is_completed', false);
+            ->with(['task' => function ($query) use ($userId) {
+                $query->where('is_completed', false);
             }])
             ->get();
 
@@ -149,7 +148,7 @@ class RoomTaskController extends Controller
             'user_id' => $userId,
             'room_task_id' => $roomTask->id,
         ]);
-        
+
         $userRoomTask->score = $request->score > $roomTask->amount ? $roomTask->amount : $request->score;
         
         if ($request->has('is_completed')) {
