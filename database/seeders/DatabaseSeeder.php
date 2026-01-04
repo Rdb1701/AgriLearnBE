@@ -52,7 +52,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Task::factory()->create([
-            'code' => 'HAVEST_CORN',
+            'code' => 'HARVEST_CORN',
             'name' => 'Harvest Corn',
             'description' => 'Harvest the mature corn from the field.',
         ]);
