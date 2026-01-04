@@ -62,8 +62,12 @@ Route::middleware(['auth:sanctum', 'instructor'])->group(function () {
     Route::get('/completion-trends', [QuizAnalyticsController::class, 'completionTrends']);
     Route::get('/difficulty-analysis', [QuizAnalyticsController::class, 'difficultyAnalysis']);
 
+    Route::post('/classroom/{id}/toggle-simulation', [ClassroomController::class, 'toggleSimulationStatus']);
+
     // Room Tasks
     Route::apiResource('/room-tasks', RoomTaskController::class)->except(['index']);
+
+    Route::get('/classroom/{classroom}/room-tasks/students', [RoomTaskController::class, 'getStudentsRoomTasksProgress']);
 });
 
 //STUDENT ROUTES
@@ -91,6 +95,9 @@ Route::middleware(['auth:sanctum', 'students'])->group(function () {
     Route::get('/classroom/game/saves', [GameController::class, 'getAllSaves']);
     Route::get('classroom/{classroom}/game/has-save', [GameController::class, 'hasSave']);
 
+    Route::get('classroom/{classroom}/room-tasks', [RoomTaskController::class, 'getAllStudentActiveRoomTasks']);
+    Route::get('classroom/{classroom}/room-tasks/progress', [RoomTaskController::class, 'getActiveRoomTasksWithProgress']);
+    Route::put('classroom/room-tasks/{room_task}/task', [RoomTaskController::class, 'increamentUserRoomTask']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -125,8 +132,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // Room Tasks General
     Route::get('/room-tasks', [RoomTaskController::class, 'index']);
     Route::get('/tasks', [RoomTaskController::class, 'getAllTasks']);
-    Route::get('/room-tasks/user/room/{classroom}', [RoomTaskController::class, 'getUserRoomTasks']);
-    Route::put('/room-tasks/user/task/{classroom}', [RoomTaskController::class, 'updateUserRoomTask']);
+
+    Route::get('/classroom/{id}/is-simulation-on', [ClassroomController::class, 'isSimulationOn']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
