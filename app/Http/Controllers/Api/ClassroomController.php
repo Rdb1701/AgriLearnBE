@@ -134,4 +134,34 @@ class ClassroomController extends Controller
             return response()->json(['message' => 'No Subject found to delete.'], 404);
         }
     }
+
+    public function toggleSimulationStatus($classroom_id)
+    {
+        $classroom = Classroom::find($classroom_id);
+
+        if (! $classroom) {
+            return response()->json(['message' => 'Classroom not found'], 404);
+        }
+
+        $classroom->is_simulation_on = ! $classroom->is_simulation_on;
+        $classroom->save();
+
+        return response()->json([
+            'message' => 'Simulation status updated successfully',
+            'is_simulation_on' => $classroom->is_simulation_on,
+        ]);
+    }
+
+    public function isSimulationOn($classroom_id)
+    {
+        $classroom = Classroom::find($classroom_id);
+
+        if (! $classroom) {
+            return response()->json(['message' => 'Classroom not found'], 404);
+        }
+
+        return response()->json([
+            'is_simulation_on' => $classroom->is_simulation_on,
+        ]);
+    }
 }

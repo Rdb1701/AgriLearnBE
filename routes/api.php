@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\OAuthController;
 use App\Http\Controllers\Api\QuizController;
 use App\Http\Controllers\Api\QuizScoreController;
 use App\Http\Controllers\Api\QuizAnalyticsController;
+use App\Http\Controllers\Api\RoomTaskController;
 use App\Mail\SendStudentsEmail;
 use App\Models\ClassEnrollment;
 use App\Models\Classroom;
@@ -60,6 +61,13 @@ Route::middleware(['auth:sanctum', 'instructor'])->group(function () {
     Route::get('/student-performance', [QuizAnalyticsController::class, 'studentPerformance']);
     Route::get('/completion-trends', [QuizAnalyticsController::class, 'completionTrends']);
     Route::get('/difficulty-analysis', [QuizAnalyticsController::class, 'difficultyAnalysis']);
+
+    Route::post('/classroom/{id}/toggle-simulation', [ClassroomController::class, 'toggleSimulationStatus']);
+
+    // Room Tasks
+    Route::apiResource('/room-tasks', RoomTaskController::class)->except(['index']);
+
+    Route::get('/classroom/{classroom}/room-tasks/students', [RoomTaskController::class, 'getStudentsRoomTasksProgress']);
 });
 
 //STUDENT ROUTES
@@ -87,6 +95,9 @@ Route::middleware(['auth:sanctum', 'students'])->group(function () {
     Route::get('/classroom/game/saves', [GameController::class, 'getAllSaves']);
     Route::get('classroom/{classroom}/game/has-save', [GameController::class, 'hasSave']);
 
+    Route::get('classroom/{classroom}/room-tasks', [RoomTaskController::class, 'getAllStudentActiveRoomTasks']);
+    Route::get('classroom/{classroom}/room-tasks/progress', [RoomTaskController::class, 'getActiveRoomTasksWithProgress']);
+    Route::put('classroom/room-tasks/{room_task}/task', [RoomTaskController::class, 'increamentUserRoomTask']);
 });
 
 Route::middleware(['auth:sanctum'])->group(function () {
@@ -117,6 +128,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/questions', [QuizAnalyticsController::class, 'Allquestions']);
     Route::get('/scores', [QuizAnalyticsController::class, 'Allscores']);
+
+    // Room Tasks General
+    Route::get('/room-tasks', [RoomTaskController::class, 'index']);
+    Route::get('/tasks', [RoomTaskController::class, 'getAllTasks']);
+
+    Route::get('/classroom/{id}/is-simulation-on', [ClassroomController::class, 'isSimulationOn']);
 });
 
 Route::post('/login', [AuthController::class, 'login']);
